@@ -69,31 +69,17 @@ export const authService = {
       return {id: user.id, email: user.email};
     } catch (err: any) {
       const code = err?.code;
-      const rawMessage = String(err?.message ?? '');
-      const keyPattern = err?.keyPattern;
 
-      if (
-        code === 11000 ||
-        rawMessage.toLowerCase().includes('e11000') ||
-        rawMessage.toLowerCase().includes('duplicate key')
-      ) {
-        const isUsername = !!(
-          keyPattern &&
-          typeof keyPattern === 'object' &&
-          'username' in keyPattern
-        );
+      if (code === 'P2002') {
+        const target = Array.isArray(err?.meta?.target)
+          ? (err.meta.target as string[])
+          : [];
 
-        const isEmail = !!(
-          keyPattern &&
-          typeof keyPattern === 'object' &&
-          'email' in keyPattern
-        );
-
-        if (isUsername || rawMessage.toLowerCase().includes('username')) {
+        if (target.includes('username')) {
           throw new ApiError(409, 'USERNAME_EXISTS', 'username already exists');
         }
 
-        if (isEmail || rawMessage.toLowerCase().includes('email')) {
+        if (target.includes('email')) {
           throw new ApiError(409, 'EMAIL_EXISTS', 'Email already exists');
         }
 
@@ -226,7 +212,7 @@ export const authService = {
     const passwordHash = await bcrypt.hash(newPassword, 10);
 
     await userRepository.clearVerificationCode(email);
-    await userRepository.updateProfile(user.id, {passwordHash} as any);
+    await userRepository.updateProfile(user.id, {passwordHash});
   },
 
   async login(email: string, password: string) {

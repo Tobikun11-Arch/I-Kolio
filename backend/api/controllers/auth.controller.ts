@@ -82,7 +82,7 @@ export const authController = {
 
       res.status(200).json({
         user: {
-          id: user._id.toString(),
+          id: user.id,
           email: user.email,
           type: userType
         }

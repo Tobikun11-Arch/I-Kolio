@@ -1,15 +1,18 @@
-import {AdminModel, AdminDocument} from '../models/Admin.model';
+import {Prisma} from '@prisma/client';
+import {prisma} from '../config/prisma';
 
 export const adminRepository = {
   findByEmail: (email: string) =>
-    AdminModel.findOne({email: email.toLowerCase()}).exec(),
+    prisma.admin.findUnique({where: {email: email.toLowerCase()}}),
 
   findByEmailOrUsername: (identifier: string) =>
-    AdminModel.findOne({
-      $or: [{email: identifier.toLowerCase()}, {username: identifier}]
-    }).exec(),
+    prisma.admin.findFirst({
+      where: {
+        OR: [{email: identifier.toLowerCase()}, {username: identifier}]
+      }
+    }),
 
-  findById: (id: string) => AdminModel.findById(id).exec(),
+  findById: (id: string) => prisma.admin.findUnique({where: {id}}),
 
-  create: (data: Partial<AdminDocument>) => AdminModel.create(data)
+  create: (data: Prisma.AdminCreateInput) => prisma.admin.create({data})
 };

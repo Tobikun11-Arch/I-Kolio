@@ -1,40 +1,34 @@
-import {UserDocument, UserModel} from '../models/User.model';
+import {Prisma} from '@prisma/client';
+import {prisma} from '../config/prisma';
 
 export const userRepository = {
   findByEmail: (email: string) =>
-    UserModel.findOne({email: email.toLowerCase()}).exec(),
+    prisma.user.findUnique({where: {email: email.toLowerCase()}}),
 
-  findById: (id: string) => UserModel.findById(id).exec(),
+  findById: (id: string) => prisma.user.findUnique({where: {id}}),
 
-  listAll: () => UserModel.find({}).exec(),
+  listAll: () => prisma.user.findMany(),
 
-  create: (data: Partial<UserDocument>) => UserModel.create(data),
+  create: (data: Prisma.UserCreateInput) => prisma.user.create({data}),
 
-  updateProfile: (
-    userId: string,
-    data: Partial<
-      Pick<
-        UserDocument,
-        'firstName' | 'lastName' | 'username' | 'email'
-      >
-    >
-  ) => UserModel.updateOne({_id: userId}, data).exec(),
+  updateProfile: (userId: string, data: Prisma.UserUpdateInput) =>
+    prisma.user.update({where: {id: userId}, data}),
 
   setVerificationCode: (email: string, code: string, expiry: Date) =>
-    UserModel.updateOne(
-      {email: email.toLowerCase()},
-      {verificationCode: code, verificationExpiry: expiry}
-    ).exec(),
+    prisma.user.update({
+      where: {email: email.toLowerCase()},
+      data: {verificationCode: code, verificationExpiry: expiry}
+    }),
 
   clearVerificationCode: (email: string) =>
-    UserModel.updateOne(
-      {email: email.toLowerCase()},
-      {verificationCode: null, verificationExpiry: null}
-    ).exec(),
+    prisma.user.update({
+      where: {email: email.toLowerCase()},
+      data: {verificationCode: null, verificationExpiry: null}
+    }),
 
   markVerified: (email: string) =>
-    UserModel.updateOne(
-      {email: email.toLowerCase()},
-      {isVerified: true, verificationCode: null, verificationExpiry: null}
-    ).exec()
+    prisma.user.update({
+      where: {email: email.toLowerCase()},
+      data: {isVerified: true, verificationCode: null, verificationExpiry: null}
+    })
 };

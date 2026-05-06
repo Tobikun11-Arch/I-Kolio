@@ -6,7 +6,7 @@ dotenv.config();
 const envSchema = z.object({
   NODE_ENV: z.string().optional(),
   PORT: z.string().optional(),
-  MONGO_URI: z.string().min(1),
+  DATABASE_URL: z.string().min(1),
   JWT_SECRET: z.string().min(1),
   JWT_REFRESH_SECRET: z.string().min(1),
   SMTP_HOST: z.string().optional(),

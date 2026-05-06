@@ -1,12 +1,3 @@
-import mongoose from 'mongoose';
-import {BaseUserDocument, createBaseUserSchema} from './base/BaseUser.schema';
+import {Admin} from '@prisma/client';
 
-export interface AdminDocument extends BaseUserDocument {}
-
-const AdminSchema = createBaseUserSchema<AdminDocument>();
-
-export const AdminModel = mongoose.model<AdminDocument>(
-  'Admin',
-  AdminSchema,
-  'admins'
-);
+export type AdminDocument = Admin;
